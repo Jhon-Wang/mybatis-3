@@ -56,6 +56,10 @@ public class CacheKey implements Cloneable, Serializable {
     return updateList.size();
   }
 
+  /**
+   * 更新CacheKey
+   * @param object
+   */
   public void update(Object object) {
     int baseHashCode = object == null ? 1 : ArrayUtil.hashCode(object); 
 
@@ -74,6 +78,11 @@ public class CacheKey implements Cloneable, Serializable {
     }
   }
 
+  /**
+   * CacheKey equal方法用于查询是否有缓存
+   * @param object
+   * @return
+   */
   @Override
   public boolean equals(Object object) {
     if (this == object) {
