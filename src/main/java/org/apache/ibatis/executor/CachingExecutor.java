@@ -39,6 +39,7 @@ import org.apache.ibatis.transaction.Transaction;
 public class CachingExecutor implements Executor {
 
   private final Executor delegate;
+  //二级缓存存储
   private final TransactionalCacheManager tcm = new TransactionalCacheManager();
 
   public CachingExecutor(Executor delegate) {
@@ -92,15 +93,24 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
+    //获取初始化的缓存
     Cache cache = ms.getCache();
+    //如果缓存为空
     if (cache != null) {
+      //如果有必要刷新缓存
       flushCacheIfRequired(ms);
+      //如果指定使用二级缓存
       if (ms.isUseCache() && resultHandler == null) {
+        //暂时不管用于处理存储过程
         ensureNoOutParams(ms, boundSql);
+        //获取缓存
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
+        //如果没有对应的缓存
         if (list == null) {
+          //委托给实际的执行器（SimpleExecutor）执行数据库查询
           list = delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          //将查询出来的结果添加到待提交列表
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;

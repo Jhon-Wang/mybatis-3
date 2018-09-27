@@ -82,6 +82,11 @@ public class TransactionalCache implements Cache {
     return null;
   }
 
+  /**
+   * 将文件提交到待提交了列表
+   * @param key Can be any object but usually it is a {@link CacheKey}
+   * @param object
+   */
   @Override
   public void putObject(Object key, Object object) {
     entriesToAddOnCommit.put(key, object);
@@ -98,6 +103,9 @@ public class TransactionalCache implements Cache {
     entriesToAddOnCommit.clear();
   }
 
+  /**
+   * commit 的行为
+   */
   public void commit() {
     if (clearOnCommit) {
       delegate.clear();
@@ -117,10 +125,17 @@ public class TransactionalCache implements Cache {
     entriesMissedInCache.clear();
   }
 
+  /**
+   * 正式添加缓存
+   */
   private void flushPendingEntries() {
+    //从待提交列表中添加哈U农村
     for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
       delegate.putObject(entry.getKey(), entry.getValue());
     }
+    /**
+     * 查不到的数据也做缓存
+     */
     for (Object entry : entriesMissedInCache) {
       if (!entriesToAddOnCommit.containsKey(entry)) {
         delegate.putObject(entry, null);
