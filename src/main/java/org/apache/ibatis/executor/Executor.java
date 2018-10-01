@@ -135,12 +135,26 @@ public interface Executor {
    */
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
 
+
   Transaction getTransaction();
 
+    /**
+     * 关闭
+     * @param forceRollback
+     */
   void close(boolean forceRollback);
 
+    /**
+     * 是否关闭
+     * @return
+     */
   boolean isClosed();
 
+    /**
+     * 包装模式的体现
+     * 设置包装对象
+     * @param executor
+     */
   void setExecutorWrapper(Executor executor);
 
 }
