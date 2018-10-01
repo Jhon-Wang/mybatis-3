@@ -71,7 +71,7 @@ public interface Executor {
   <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException;
 
     /**
-     *
+     * 查询光标
      * @param ms
      * @param parameter
      * @param rowBounds
@@ -81,18 +81,58 @@ public interface Executor {
      */
   <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException;
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
   List<BatchResult> flushStatements() throws SQLException;
 
+  /**
+   * 提交接口
+   * @param required
+   * @throws SQLException
+   */
   void commit(boolean required) throws SQLException;
 
+  /**
+   * 回滚接口
+   * @param required
+   * @throws SQLException
+   */
   void rollback(boolean required) throws SQLException;
 
+  /**
+   * 创建缓存键
+   * @param ms
+   * @param parameterObject
+   * @param rowBounds
+   * @param boundSql
+   * @return
+   */
   CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql);
 
+  /**
+   * 判断是否缓存
+   * @param ms
+   * @param key
+   * @return
+   */
   boolean isCached(MappedStatement ms, CacheKey key);
 
+  /**
+   * 清除一级缓存
+   */
   void clearLocalCache();
 
+  /**
+   * 默认加载
+   * @param ms
+   * @param resultObject
+   * @param property
+   * @param key
+   * @param targetType
+   */
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
 
   Transaction getTransaction();
