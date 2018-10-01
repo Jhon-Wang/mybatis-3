@@ -32,15 +32,23 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 /**
  * @author Larry Meadors
  */
+/**
+ * 这个类可能是废弃不使用的
+ * 同时实现了SqlSession 和SqlSessionFaction 两个接口
+ */
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
-
+    //defaultSqlSessionFactory 的方法
   private final SqlSessionFactory sqlSessionFactory;
+  //proxy 代理 jdk 动态代理出来的proxy
   private final SqlSession sqlSessionProxy;
 
+  //保存线程局部变量
   private final ThreadLocal<SqlSession> localSqlSession = new ThreadLocal<>();
 
   private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
+    //proxy 是重点 使用jdk动态代理创建实力
+      //
     this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(
         SqlSessionFactory.class.getClassLoader(),
         new Class[]{SqlSession.class},
@@ -75,6 +83,9 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     return new SqlSessionManager(sqlSessionFactory);
   }
 
+    /**
+     * 设置线程局部变量的方法
+     */
   public void startManagedSession() {
     this.localSqlSession.set(openSession());
   }
@@ -337,6 +348,9 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     }
   }
 
+    /**
+     * 私有类 拦截器 用于增强DefaultSqlSession 的作用
+     */
   private class SqlSessionInterceptor implements InvocationHandler {
     public SqlSessionInterceptor() {
         // Prevent Synthetic Access
@@ -347,11 +361,13 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
       final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
       if (sqlSession != null) {
         try {
+            //存在线程局部变量SqlSession（不提交，不回滚，不关闭，可在线程生命周期内，自定义SqlSession 的提交回滚，关闭时机，达到复用SqlSession 的目的）
           return method.invoke(sqlSession, args);
         } catch (Throwable t) {
           throw ExceptionUtil.unwrapThrowable(t);
         }
       } else {
+          //不存在线程局部变量SqlSession的时候，创建一个自动提交、回滚、关闭的SqlSession（提交、回滚、关闭，将sqlSession的生命周期完全想定在方法内）
         try (SqlSession autoSqlSession = openSession()) {
           try {
             final Object result = method.invoke(autoSqlSession, args);

@@ -163,10 +163,19 @@ public class DefaultSqlSession implements SqlSession {
     select(statement, null, RowBounds.DEFAULT, handler);
   }
 
+    /**
+     * 查询方法
+     * @param statement Unique identifier matching the statement to use.
+     * @param parameter
+     * @param rowBounds RowBound instance to limit the query results
+     * @param handler ResultHandler that will handle each retrieved row
+     */
   @Override
   public void select(String statement, Object parameter, RowBounds rowBounds, ResultHandler handler) {
     try {
+//        从配置文件中获取mappedStatement 对象
       MappedStatement ms = configuration.getMappedStatement(statement);
+//      使用获取到的MappedStatement使用执行器查询
       executor.query(ms, wrapCollection(parameter), rowBounds, handler);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -181,7 +190,7 @@ public class DefaultSqlSession implements SqlSession {
   }
 
   @Override
-  public int insert(String statement, Object parameter) {
+  public int insert(String statement,Object parameter) {
     return update(statement, parameter);
   }
 
@@ -190,6 +199,12 @@ public class DefaultSqlSession implements SqlSession {
     return update(statement, null);
   }
 
+    /**
+     * 更新方法
+     * @param statement Unique identifier matching the statement to execute.
+     * @param parameter A parameter object to pass to the statement.
+     * @return
+     */
   @Override
   public int update(String statement, Object parameter) {
     try {
