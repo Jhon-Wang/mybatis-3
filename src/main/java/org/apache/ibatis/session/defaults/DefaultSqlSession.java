@@ -200,7 +200,7 @@ public class DefaultSqlSession implements SqlSession {
   }
 
     /**
-     * 更新方法
+     * 更新方法 设置类dirty 为true
      * @param statement Unique identifier matching the statement to execute.
      * @param parameter A parameter object to pass to the statement.
      * @return
@@ -233,6 +233,10 @@ public class DefaultSqlSession implements SqlSession {
     commit(false);
   }
 
+    /**
+     * 如果提交dirty 设置为 false
+     * @param force forces connection commit
+     */
   @Override
   public void commit(boolean force) {
     try {
@@ -250,6 +254,10 @@ public class DefaultSqlSession implements SqlSession {
     rollback(false);
   }
 
+    /**
+     * 将dirty 设置为false
+     * @param force forces connection rollback
+     */
   @Override
   public void rollback(boolean force) {
     try {
@@ -273,6 +281,10 @@ public class DefaultSqlSession implements SqlSession {
     }
   }
 
+    /**
+     * 关闭连接远吗
+     * 如果dirty 属性为true那么就关闭的时候就需要rollback
+     */
   @Override
   public void close() {
     try {
@@ -328,6 +340,13 @@ public class DefaultSqlSession implements SqlSession {
     cursorList.add(cursor);
   }
 
+    /**
+     * 判断是否需要回滚
+     * dirty 只要在执行 update insert delete 方法后都会设置为true ，在 commit rollback close 之后设置为false
+     * 所以如果 修改了 未执行commit 那么就是true
+     * @param force
+     * @return
+     */
   private boolean isCommitOrRollbackRequired(boolean force) {
     return (!autoCommit && dirty) || force;
   }
