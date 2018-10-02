@@ -34,6 +34,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
 /**
+ * The Class ReuseExecutor.
+ *
  * @author Clinton Begin
  */
 
@@ -43,21 +45,26 @@ import org.apache.ibatis.transaction.Transaction;
  */
 public class ReuseExecutor extends BaseExecutor {
 
-  /**
-   * 用于存储Statement
-   */
+  /** 用于存储Statement. */
   private final Map<String, Statement> statementMap = new HashMap<>();
 
+  /**
+   * Instantiates a new reuse executor.
+   *
+   * @param configuration the configuration
+   * @param transaction the transaction
+   */
   public ReuseExecutor(Configuration configuration, Transaction transaction) {
     super(configuration, transaction);
   }
 
   /**
-   * 执行完成之后不关闭Statement
-   * @param ms
-   * @param parameter
-   * @return
-   * @throws SQLException
+   * 执行完成之后不关闭Statement.
+   *
+   * @param ms the ms
+   * @param parameter the parameter
+   * @return the int
+   * @throws SQLException the SQL exception
    */
   @Override
   public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
@@ -67,6 +74,9 @@ public class ReuseExecutor extends BaseExecutor {
     return handler.update(stmt);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.ibatis.executor.BaseExecutor#doQuery(org.apache.ibatis.mapping.MappedStatement, java.lang.Object, org.apache.ibatis.session.RowBounds, org.apache.ibatis.session.ResultHandler, org.apache.ibatis.mapping.BoundSql)
+   */
   @Override
   public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
     Configuration configuration = ms.getConfiguration();
@@ -75,6 +85,9 @@ public class ReuseExecutor extends BaseExecutor {
     return handler.<E>query(stmt, resultHandler);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.ibatis.executor.BaseExecutor#doQueryCursor(org.apache.ibatis.mapping.MappedStatement, java.lang.Object, org.apache.ibatis.session.RowBounds, org.apache.ibatis.mapping.BoundSql)
+   */
   @Override
   protected <E> Cursor<E> doQueryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds, BoundSql boundSql) throws SQLException {
     Configuration configuration = ms.getConfiguration();
@@ -84,10 +97,11 @@ public class ReuseExecutor extends BaseExecutor {
   }
 
   /**
-   * 在这个位置关闭Statement
-   * @param isRollback
-   * @return
-   * @throws SQLException
+   * 在这个位置关闭Statement.
+   *
+   * @param isRollback the is rollback
+   * @return the list
+   * @throws SQLException the SQL exception
    */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException {
@@ -99,6 +113,14 @@ public class ReuseExecutor extends BaseExecutor {
     return Collections.emptyList();
   }
 
+  /**
+   * Prepare statement.
+   *
+   * @param handler the handler
+   * @param statementLog the statement log
+   * @return the statement
+   * @throws SQLException the SQL exception
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
@@ -119,6 +141,12 @@ public class ReuseExecutor extends BaseExecutor {
     return stmt;
   }
 
+  /**
+   * Checks for statement for.
+   *
+   * @param sql the sql
+   * @return true, if successful
+   */
   private boolean hasStatementFor(String sql) {
     try {
       return statementMap.keySet().contains(sql) && !statementMap.get(sql).getConnection().isClosed();
@@ -127,10 +155,23 @@ public class ReuseExecutor extends BaseExecutor {
     }
   }
 
+  /**
+   * Gets the statement.
+   *
+   * @param s the s
+   * @return the statement
+   */
   private Statement getStatement(String s) {
     return statementMap.get(s);
   }
 
+  
+  /**
+   * Put statement.
+   *
+   * @param sql the sql
+   * @param stmt the stmt
+   */
   private void putStatement(String sql, Statement stmt) {
     statementMap.put(sql, stmt);
   }

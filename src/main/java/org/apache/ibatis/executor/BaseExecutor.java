@@ -52,7 +52,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  * 经典模板设计模式
  * 抽象模板类
  * 抽象模板：定义一个操作中的算法骨架，而将一些步骤延迟到子类中。
- * 模板方法使得子类可以不改变一个算法的结构即可宠幸定义该算法的某些特定步骤。
+ * 模板方法使得子类可以不改变一个算法的结构即可重新定义该算法的某些特定步骤。
  */
 public abstract class BaseExecutor implements Executor {
 
@@ -154,6 +154,17 @@ public abstract class BaseExecutor implements Executor {
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
  }
 
+  /**
+   * 执行查询
+   * @param ms
+   * @param parameter
+   * @param rowBounds
+   * @param resultHandler
+   * @param key
+   * @param boundSql
+   * @return
+   * @throws SQLException
+   */
   @SuppressWarnings("unchecked")
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
@@ -191,12 +202,28 @@ public abstract class BaseExecutor implements Executor {
     return list;
   }
 
+  /**
+   * 查询光标
+   * @param ms
+   * @param parameter
+   * @param rowBounds
+   * @return
+   * @throws SQLException
+   */
   @Override
   public <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException {
     BoundSql boundSql = ms.getBoundSql(parameter);
     return doQueryCursor(ms, parameter, rowBounds, boundSql);
   }
 
+  /**
+   * 默认加载
+   * @param ms
+   * @param resultObject
+   * @param property
+   * @param key
+   * @param targetType
+   */
   @Override
   public void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType) {
     if (closed) {
@@ -255,11 +282,22 @@ public abstract class BaseExecutor implements Executor {
     return cacheKey;
   }
 
+  /**
+   * 是否已经缓存
+   * @param ms
+   * @param key
+   * @return
+   */
   @Override
   public boolean isCached(MappedStatement ms, CacheKey key) {
     return localCache.getObject(key) != null;
   }
 
+  /**
+   * 提交
+   * @param required
+   * @throws SQLException
+   */
   @Override
   public void commit(boolean required) throws SQLException {
     if (closed) {
@@ -272,6 +310,11 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+  /**
+   * 回滚
+   * @param required
+   * @throws SQLException
+   */
   @Override
   public void rollback(boolean required) throws SQLException {
     if (!closed) {
@@ -286,6 +329,9 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+  /**
+   * 清除一级缓存
+   */
   @Override
   public void clearLocalCache() {
     if (!closed) {
@@ -294,9 +340,22 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+  /**
+   * 执行更新
+   * @param ms 
+   * @param parameter
+   * @return
+   * @throws SQLException
+   */
   protected abstract int doUpdate(MappedStatement ms, Object parameter)
       throws SQLException;
 
+  /**
+   * 
+   * @param isRollback
+   * @return
+   * @throws SQLException
+   */
   protected abstract List<BatchResult> doFlushStatements(boolean isRollback)
       throws SQLException;
 

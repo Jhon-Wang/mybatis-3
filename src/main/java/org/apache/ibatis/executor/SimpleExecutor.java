@@ -64,6 +64,17 @@ public class SimpleExecutor extends BaseExecutor {
     }
   }
 
+
+  /**
+   * 执行查询
+   * @param ms
+   * @param parameter
+   * @param rowBounds
+   * @param resultHandler
+   * @param boundSql
+   * @return
+   * @throws SQLException
+   */
   @Override
   public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
     Statement stmt = null;
@@ -77,6 +88,15 @@ public class SimpleExecutor extends BaseExecutor {
     }
   }
 
+  /**
+   * 查询光标
+   * @param ms
+   * @param parameter
+   * @param rowBounds
+   * @param boundSql
+   * @return
+   * @throws SQLException
+   */
   @Override
   protected <E> Cursor<E> doQueryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds, BoundSql boundSql) throws SQLException {
     Configuration configuration = ms.getConfiguration();
@@ -85,11 +105,24 @@ public class SimpleExecutor extends BaseExecutor {
     return handler.<E>queryCursor(stmt);
   }
 
+  /**
+   * 执行操作
+   * @param isRollback
+   * @return
+   * @throws SQLException
+   */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException {
     return Collections.emptyList();
   }
-
+  
+  /**
+   * 准备
+   * @param handler
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     Connection connection = getConnection(statementLog);
