@@ -34,6 +34,10 @@ import java.util.List;
 /**
  * @author Clinton Begin
  */
+
+/**
+ * 执行一次update或select，就开启一个Statement，用完立即关闭Statement对象
+ */
 public class SimpleExecutor extends BaseExecutor {
 
   public SimpleExecutor(Configuration configuration, Transaction transaction) {

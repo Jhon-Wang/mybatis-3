@@ -282,6 +282,10 @@ public class ResultLoaderMap {
     }
   }
 
+  /**
+   * 仅仅作为标示
+   * 没有用处，不支持各种操作
+   */
   private static final class ClosedExecutor extends BaseExecutor {
 
     public ClosedExecutor() {

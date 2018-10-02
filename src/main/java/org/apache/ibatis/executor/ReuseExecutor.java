@@ -36,6 +36,11 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Clinton Begin
  */
+
+/**
+ * 执行update或select，以sql 作为key查询Statement 对象，存在就使用不存在就创建
+ * 用完之后不关闭Statement对象，而是将其放置在Map<String,Statement>内，供下一次使用
+ */
 public class ReuseExecutor extends BaseExecutor {
 
   private final Map<String, Statement> statementMap = new HashMap<>();

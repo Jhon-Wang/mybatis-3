@@ -36,6 +36,11 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
+
+/**
+ * 装饰器模式典范，先从缓存中读取查询结果，存在返回，不存在再委托给Executor delegate执行读取，delegate可以是
+ * 任意继承了Executor 的实体类（不包括CloseExecutor）
+ */
 public class CachingExecutor implements Executor {
 
   private final Executor delegate;

@@ -47,6 +47,13 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 /**
  * @author Clinton Begin
  */
+
+/**
+ * 经典模板设计模式
+ * 抽象模板类
+ * 抽象模板：定义一个操作中的算法骨架，而将一些步骤延迟到子类中。
+ * 模板方法使得子类可以不改变一个算法的结构即可宠幸定义该算法的某些特定步骤。
+ */
 public abstract class BaseExecutor implements Executor {
 
   private static final Log log = LogFactory.getLog(BaseExecutor.class);

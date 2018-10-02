@@ -38,6 +38,12 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Jeff Butler 
  */
+
+/**
+ * 执行update（没有 select ），将所有sql添加到批处理中(addBatch())，等待统一执行(executeBatch())
+ * 它缓存了多个Statement对象，每个Statement对象都是addBatch()完毕之后，等待逐一执行execteBatch()
+ * 批处理BatchExecutor 相当于维护了多个桶，每个桶都装了许多属于自己的Sql，最后统一倒入仓库
+ */
 public class BatchExecutor extends BaseExecutor {
 
   public static final int BATCH_UPDATE_RETURN_VALUE = Integer.MIN_VALUE + 1002;
