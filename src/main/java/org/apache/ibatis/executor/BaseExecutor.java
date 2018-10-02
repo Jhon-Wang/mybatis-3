@@ -129,6 +129,12 @@ public abstract class BaseExecutor implements Executor {
     return flushStatements(false);
   }
 
+  /**
+   * 是否需要回滚
+   * @param isRollBack
+   * @return
+   * @throws SQLException
+   */
   public List<BatchResult> flushStatements(boolean isRollBack) throws SQLException {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
@@ -151,6 +157,7 @@ public abstract class BaseExecutor implements Executor {
     BoundSql boundSql = ms.getBoundSql(parameter);
     //计算缓存
     CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);
+    //执行查询
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
  }
 
@@ -178,7 +185,9 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
+      //获取一级缓存
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
+      //如果一级缓存存在
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
@@ -351,7 +360,7 @@ public abstract class BaseExecutor implements Executor {
       throws SQLException;
 
   /**
-   * 
+   * 执行清除
    * @param isRollback
    * @return
    * @throws SQLException
@@ -388,6 +397,13 @@ public abstract class BaseExecutor implements Executor {
     StatementUtil.applyTransactionTimeout(statement, statement.getQueryTimeout(), transaction.getTimeout());
   }
 
+  /**
+   * 软件
+   * @param ms
+   * @param key
+   * @param parameter
+   * @param boundSql
+   */
   private void handleLocallyCachedOutputParameters(MappedStatement ms, CacheKey key, Object parameter, BoundSql boundSql) {
     if (ms.getStatementType() == StatementType.CALLABLE) {
       final Object cachedParameter = localOutputParameterCache.getObject(key);
