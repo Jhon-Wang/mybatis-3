@@ -43,12 +43,22 @@ import org.apache.ibatis.transaction.Transaction;
  */
 public class ReuseExecutor extends BaseExecutor {
 
+  /**
+   * 用于存储Statement
+   */
   private final Map<String, Statement> statementMap = new HashMap<>();
 
   public ReuseExecutor(Configuration configuration, Transaction transaction) {
     super(configuration, transaction);
   }
 
+  /**
+   * 执行完成之后不关闭Statement
+   * @param ms
+   * @param parameter
+   * @return
+   * @throws SQLException
+   */
   @Override
   public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
     Configuration configuration = ms.getConfiguration();
@@ -73,8 +83,15 @@ public class ReuseExecutor extends BaseExecutor {
     return handler.<E>queryCursor(stmt);
   }
 
+  /**
+   * 在这个位置关闭Statement
+   * @param isRollback
+   * @return
+   * @throws SQLException
+   */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException {
+//    关闭Statement
     for (Statement stmt : statementMap.values()) {
       closeStatement(stmt);
     }
@@ -86,12 +103,16 @@ public class ReuseExecutor extends BaseExecutor {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
     String sql = boundSql.getSql();
+    //如果存在Statement 并且连接还没有关闭
     if (hasStatementFor(sql)) {
+      //冲StatementMap中获取Statement
       stmt = getStatement(sql);
       applyTransactionTimeout(stmt);
     } else {
+      //如果没有
       Connection connection = getConnection(statementLog);
       stmt = handler.prepare(connection, transaction.getTimeout());
+      //将Statement放到StatementMap中
       putStatement(sql, stmt);
     }
     handler.parameterize(stmt);
