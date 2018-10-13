@@ -29,39 +29,132 @@ import org.apache.ibatis.transaction.Transaction;
 
 /**
  * @author Clinton Begin
+ * 执行器接口
  */
 public interface Executor {
 
   ResultHandler NO_RESULT_HANDLER = null;
 
+    /**
+     * 更新接口
+     * @param ms
+     * @param parameter
+     * @return
+     * @throws SQLException
+     */
   int update(MappedStatement ms, Object parameter) throws SQLException;
 
+    /**
+     * 查询借口
+     * @param ms
+     * @param parameter
+     * @param rowBounds
+     * @param resultHandler
+     * @param cacheKey
+     * @param boundSql
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
   <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException;
 
+    /**
+     * 查询接口
+     * @param ms
+     * @param parameter
+     * @param rowBounds
+     * @param resultHandler
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
   <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException;
 
+    /**
+     * 查询光标
+     * @param ms
+     * @param parameter
+     * @param rowBounds
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
   <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException;
 
+    /**
+     *  清除缓存
+     * @return
+     * @throws SQLException
+     */
   List<BatchResult> flushStatements() throws SQLException;
 
+  /**
+   * 提交接口
+   * @param required
+   * @throws SQLException
+   */
   void commit(boolean required) throws SQLException;
 
+  /**
+   * 回滚接口
+   * @param required
+   * @throws SQLException
+   */
   void rollback(boolean required) throws SQLException;
 
+  /**
+   * 创建缓存键
+   * @param ms
+   * @param parameterObject
+   * @param rowBounds
+   * @param boundSql
+   * @return
+   */
   CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql);
 
+  /**
+   * 判断是否缓存
+   * @param ms
+   * @param key
+   * @return
+   */
   boolean isCached(MappedStatement ms, CacheKey key);
 
+  /**
+   * 清除一级缓存
+   */
   void clearLocalCache();
 
+  /**
+   * 默认加载
+   * @param ms
+   * @param resultObject
+   * @param property
+   * @param key
+   * @param targetType
+   */
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
+
 
   Transaction getTransaction();
 
+    /**
+     * 关闭
+     * @param forceRollback
+     */
   void close(boolean forceRollback);
 
+    /**
+     * 是否关闭
+     * @return
+     */
   boolean isClosed();
 
+    /**
+     * 包装模式的体现
+     * 设置包装对象
+     * @param executor
+     */
   void setExecutorWrapper(Executor executor);
 
 }

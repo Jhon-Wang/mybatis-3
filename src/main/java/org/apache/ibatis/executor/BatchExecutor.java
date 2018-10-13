@@ -38,12 +38,21 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Jeff Butler 
  */
+
+/**
+ * 执行update（没有 select ），将所有sql添加到批处理中(addBatch())，等待统一执行(executeBatch())
+ * 它缓存了多个Statement对象，每个Statement对象都是addBatch()完毕之后，等待逐一执行execteBatch()
+ * 批处理BatchExecutor 相当于维护了多个桶，每个桶都装了许多属于自己的Sql，最后统一倒入仓库
+ */
 public class BatchExecutor extends BaseExecutor {
 
   public static final int BATCH_UPDATE_RETURN_VALUE = Integer.MIN_VALUE + 1002;
 
+  //用于缓存多个Statement对象
   private final List<Statement> statementList = new ArrayList<>();
+  //对应的结果集合
   private final List<BatchResult> batchResultList = new ArrayList<>();
+  //当前保存的Sql即上次执行的sql
   private String currentSql;
   private MappedStatement currentStatement;
 
@@ -56,9 +65,12 @@ public class BatchExecutor extends BaseExecutor {
     final Configuration configuration = ms.getConfiguration();
     final StatementHandler handler = configuration.newStatementHandler(this, ms, parameterObject, RowBounds.DEFAULT, null, null);
     final BoundSql boundSql = handler.getBoundSql();
+    //本次要执行的sql
     final String sql = boundSql.getSql();
     final Statement stmt;
+    //如果当前的Sql 和之前执行的Sql 相同，同时MapperStatement也相同
     if (sql.equals(currentSql) && ms.equals(currentStatement)) {
+      //如果已经存在Statement 那么就取出最后一个Statement
       int last = statementList.size() - 1;
       stmt = statementList.get(last);
       applyTransactionTimeout(stmt);
@@ -66,15 +78,18 @@ public class BatchExecutor extends BaseExecutor {
       BatchResult batchResult = batchResultList.get(last);
       batchResult.addParameterObject(parameterObject);
     } else {
+      //如果不存在那么新建
       Connection connection = getConnection(ms.getStatementLog());
       stmt = handler.prepare(connection, transaction.getTimeout());
       handler.parameterize(stmt);    //fix Issues 322
       currentSql = sql;
       currentStatement = ms;
+      //添加到Statement列表
       statementList.add(stmt);
       batchResultList.add(new BatchResult(ms, sql, parameterObject));
     }
   // handler.parameterize(stmt);
+    //将sql以addBatch()的方式，添加到Statement中
     handler.batch(stmt);
     return BATCH_UPDATE_RETURN_VALUE;
   }

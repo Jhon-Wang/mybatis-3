@@ -35,6 +35,10 @@ import org.apache.ibatis.transaction.TransactionException;
  *
  * @see JdbcTransactionFactory
  */
+
+/**
+ * 默认事务管理实现类仅是让connection 支持连接池而已
+ */
 public class JdbcTransaction implements Transaction {
 
   private static final Log log = LogFactory.getLog(JdbcTransaction.class);
@@ -85,6 +89,7 @@ public class JdbcTransaction implements Transaction {
   @Override
   public void close() throws SQLException {
     if (connection != null) {
+      //重置自动提交，如果是线程池 那么会将连接重新 放回线程池 ，所以要重置 ，如果没有使用线程池 同样是支持的
       resetAutoCommit();
       if (log.isDebugEnabled()) {
         log.debug("Closing JDBC Connection [" + connection + "]");

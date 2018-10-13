@@ -163,10 +163,19 @@ public class DefaultSqlSession implements SqlSession {
     select(statement, null, RowBounds.DEFAULT, handler);
   }
 
+    /**
+     * 查询方法
+     * @param statement Unique identifier matching the statement to use.
+     * @param parameter
+     * @param rowBounds RowBound instance to limit the query results
+     * @param handler ResultHandler that will handle each retrieved row
+     */
   @Override
   public void select(String statement, Object parameter, RowBounds rowBounds, ResultHandler handler) {
     try {
+//        从配置文件中获取mappedStatement 对象
       MappedStatement ms = configuration.getMappedStatement(statement);
+//      使用获取到的MappedStatement使用执行器查询
       executor.query(ms, wrapCollection(parameter), rowBounds, handler);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -181,7 +190,7 @@ public class DefaultSqlSession implements SqlSession {
   }
 
   @Override
-  public int insert(String statement, Object parameter) {
+  public int insert(String statement,Object parameter) {
     return update(statement, parameter);
   }
 
@@ -190,6 +199,12 @@ public class DefaultSqlSession implements SqlSession {
     return update(statement, null);
   }
 
+    /**
+     * 更新方法 设置类dirty 为true
+     * @param statement Unique identifier matching the statement to execute.
+     * @param parameter A parameter object to pass to the statement.
+     * @return
+     */
   @Override
   public int update(String statement, Object parameter) {
     try {
@@ -218,6 +233,10 @@ public class DefaultSqlSession implements SqlSession {
     commit(false);
   }
 
+    /**
+     * 如果提交dirty 设置为 false
+     * @param force forces connection commit
+     */
   @Override
   public void commit(boolean force) {
     try {
@@ -235,6 +254,10 @@ public class DefaultSqlSession implements SqlSession {
     rollback(false);
   }
 
+    /**
+     * 将dirty 设置为false
+     * @param force forces connection rollback
+     */
   @Override
   public void rollback(boolean force) {
     try {
@@ -258,6 +281,10 @@ public class DefaultSqlSession implements SqlSession {
     }
   }
 
+    /**
+     * 关闭连接远吗
+     * 如果dirty 属性为true那么就关闭的时候就需要rollback
+     */
   @Override
   public void close() {
     try {
@@ -313,6 +340,13 @@ public class DefaultSqlSession implements SqlSession {
     cursorList.add(cursor);
   }
 
+    /**
+     * 判断是否需要回滚
+     * dirty 只要在执行 update insert delete 方法后都会设置为true ，在 commit rollback close 之后设置为false
+     * 所以如果 修改了 未执行commit 那么就是true
+     * @param force
+     * @return
+     */
   private boolean isCommitOrRollbackRequired(boolean force) {
     return (!autoCommit && dirty) || force;
   }

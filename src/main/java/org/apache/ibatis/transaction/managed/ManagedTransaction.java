@@ -34,6 +34,10 @@ import org.apache.ibatis.transaction.Transaction;
  *
  * @see ManagedTransactionFactory
  */
+
+/**
+ * 托管事务，在其他环境使用时比如Spring，让Spring去管理事务
+ */
 public class ManagedTransaction implements Transaction {
 
   private static final Log log = LogFactory.getLog(ManagedTransaction.class);

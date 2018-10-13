@@ -36,9 +36,15 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
+
+/**
+ * 装饰器模式典范，先从缓存中读取查询结果，存在返回，不存在再委托给Executor delegate执行读取，delegate可以是
+ * 任意继承了Executor 的实体类（不包括CloseExecutor）
+ */
 public class CachingExecutor implements Executor {
 
   private final Executor delegate;
+  //二级缓存存储
   private final TransactionalCacheManager tcm = new TransactionalCacheManager();
 
   public CachingExecutor(Executor delegate) {
@@ -94,6 +100,7 @@ public class CachingExecutor implements Executor {
       throws SQLException {
     //首先获取初始化时赋予的 缓存
     Cache cache = ms.getCache();
+    //如果缓存为空
     if (cache != null) {
       //判断是否需要刷新缓存
       flushCacheIfRequired(ms);
@@ -104,9 +111,11 @@ public class CachingExecutor implements Executor {
         //获取缓存列表
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
+        //如果没有对应的缓存
         if (list == null) {
           //查询并将查到的存入缓存之中
           list = delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          //将查询出来的结果添加到待提交列表
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;
