@@ -50,6 +50,9 @@ import org.apache.ibatis.type.TypeHandler;
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
+ * xml 构建类 解析XML 文件
+ * 典型的建造者模式
+ * 用于构建 mybatis 的配置文件
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
