@@ -56,6 +56,9 @@ public class CacheKey implements Cloneable, Serializable {
     return updateList.size();
   }
 
+  //首先是成员变量和构造函数，有一个初始的hachcode和乘数，
+  // 同时维护了一个内部的updatelist。
+  // 在CacheKey的update方法中，会进行一个hashcode和checksum的计算，同时把传入的参数添加进updatelist中。
   public void update(Object object) {
     int baseHashCode = object == null ? 1 : ArrayUtil.hashCode(object); 
 

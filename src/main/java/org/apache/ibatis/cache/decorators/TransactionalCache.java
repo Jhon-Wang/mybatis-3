@@ -65,6 +65,7 @@ public class TransactionalCache implements Cache {
   @Override
   public Object getObject(Object key) {
     // issue #116
+    //如果没有查到缓存 那么就将key 加入到miss集合
     Object object = delegate.getObject(key);
     if (object == null) {
       entriesMissedInCache.add(key);
