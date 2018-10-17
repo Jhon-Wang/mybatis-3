@@ -143,7 +143,7 @@ public abstract class BaseExecutor implements Executor {
   }
 
   /**
-   *  开启一级缓存 执行查询
+   * 一级缓存开启时的查询
    * @param ms
    * @param parameter
    * @param rowBounds
@@ -162,13 +162,14 @@ public abstract class BaseExecutor implements Executor {
  }
 
   /**
-   * 执行查询
+   * 具体查询
    * @param ms
    * @param parameter
    * @param rowBounds
    * @param resultHandler
    * @param key
    * @param boundSql
+   * @param <E>
    * @return
    * @throws SQLException
    */
@@ -185,12 +186,13 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
-      //获取一级缓存
+      //获取缓存内容
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       //如果一级缓存存在
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        //不存在缓存 直接从数据库查询数据
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -202,7 +204,7 @@ public abstract class BaseExecutor implements Executor {
       }
       // issue #601
       deferredLoads.clear();
-      //获取一级缓存范围如果不是SESSION N那么清空缓存
+      //如果一级缓存范围是STATEMENT 那么清理一级缓存
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
         // issue #482
         clearLocalCache();
@@ -247,7 +249,7 @@ public abstract class BaseExecutor implements Executor {
   }
 
   /**
-   * 创建CacheKey
+   * 缓存键创建
    * @param ms
    * @param parameterObject
    * @param rowBounds
