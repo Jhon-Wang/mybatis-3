@@ -71,16 +71,38 @@ public class XMLMapperBuilder extends BaseBuilder {
         configuration, resource, sqlFragments);
   }
 
+  /**
+   * 构造器方法
+   * @param inputStream
+   * @param configuration
+   * @param resource
+   * @param sqlFragments
+   * @param namespace
+   */
   public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
     this(inputStream, configuration, resource, sqlFragments);
     this.builderAssistant.setCurrentNamespace(namespace);
   }
 
+  /**
+   * 构造器方法
+   * @param inputStream
+   * @param configuration
+   * @param resource
+   * @param sqlFragments
+   */
   public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     this(new XPathParser(inputStream, true, configuration.getVariables(), new XMLMapperEntityResolver()),
         configuration, resource, sqlFragments);
   }
 
+  /**
+   * 构造器方法
+   * @param parser
+   * @param configuration
+   * @param resource
+   * @param sqlFragments
+   */
   private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     super(configuration);
     this.builderAssistant = new MapperBuilderAssistant(configuration, resource);
@@ -89,8 +111,12 @@ public class XMLMapperBuilder extends BaseBuilder {
     this.resource = resource;
   }
 
+  /**
+   * 解析
+   */
   public void parse() {
     if (!configuration.isResourceLoaded(resource)) {
+      //传入根节点 解析<mapper>
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
       bindMapperForNamespace();
@@ -105,18 +131,30 @@ public class XMLMapperBuilder extends BaseBuilder {
     return sqlFragments.get(refid);
   }
 
+  /**
+   * 解析<mapper></mapper> 节点
+   * @param context
+   */
   private void configurationElement(XNode context) {
     try {
+      //命名空间
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
+      //设置当前命名空间
       builderAssistant.setCurrentNamespace(namespace);
+      //缓存引用
       cacheRefElement(context.evalNode("cache-ref"));
+      //缓存
       cacheElement(context.evalNode("cache"));
+      //参数Mapper
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      //结果Mapper
       resultMapElements(context.evalNodes("/mapper/resultMap"));
+      //sql 元素解析
       sqlElement(context.evalNodes("/mapper/sql"));
+      //构建Statement
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -186,6 +224,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析<cacheRefElement></cacheRefElement>元素
+   * @param context
+   */
   private void cacheRefElement(XNode context) {
     if (context != null) {
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
