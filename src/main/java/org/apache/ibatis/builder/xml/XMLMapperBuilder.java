@@ -59,12 +59,27 @@ public class XMLMapperBuilder extends BaseBuilder {
   private final Map<String, XNode> sqlFragments;
   private final String resource;
 
+  /**
+   * 将要废弃
+   * @param reader
+   * @param configuration
+   * @param resource
+   * @param sqlFragments
+   * @param namespace
+   */
   @Deprecated
   public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
     this(reader, configuration, resource, sqlFragments);
     this.builderAssistant.setCurrentNamespace(namespace);
   }
 
+  /**
+   * 将要废弃
+   * @param reader
+   * @param configuration
+   * @param resource
+   * @param sqlFragments
+   */
   @Deprecated
   public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     this(new XPathParser(reader, true, configuration.getVariables(), new XMLMapperEntityResolver()),
@@ -161,6 +176,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 从上下文构建Statement
+   * @param list
+   */
   private void buildStatementFromContext(List<XNode> list) {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
