@@ -240,6 +240,11 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析<cache></cache>节点
+   * @param context
+   * @throws Exception
+   */
   private void cacheElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type", "PERPETUAL");
@@ -255,6 +260,11 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * parmaeterMap节点解析
+   * @param list
+   * @throws Exception
+   */
   private void parameterMapElement(List<XNode> list) throws Exception {
     for (XNode parameterMapNode : list) {
       String id = parameterMapNode.getStringAttribute("id");
