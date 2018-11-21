@@ -27,7 +27,10 @@ import java.sql.Connection;
  * 会话创建工厂
  */
 public interface SqlSessionFactory {
-
+  /**
+   * 创建会话
+   * @return
+   */
   SqlSession openSession();
 
   SqlSession openSession(boolean autoCommit);

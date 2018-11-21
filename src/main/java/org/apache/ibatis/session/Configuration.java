@@ -710,14 +710,27 @@ public class Configuration {
     return incompleteMethods;
   }
 
+  /**
+   * 构建查询语句
+   * @param id
+   * @return
+   */
   public MappedStatement getMappedStatement(String id) {
     return this.getMappedStatement(id, true);
   }
 
+  /**
+   * 构建查询语句
+   * @param id
+   * @param validateIncompleteStatements
+   * @return
+   */
   public MappedStatement getMappedStatement(String id, boolean validateIncompleteStatements) {
+    //如果参数为true 构建所有的语句
     if (validateIncompleteStatements) {
       buildAllStatements();
     }
+    //获取组装后的语句
     return mappedStatements.get(id);
   }
 

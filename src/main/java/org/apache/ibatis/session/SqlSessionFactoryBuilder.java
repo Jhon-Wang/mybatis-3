@@ -32,6 +32,9 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
  */
 public class SqlSessionFactoryBuilder {
 
+  /**
+   *   创建会话工厂
+   */
   public SqlSessionFactory build(Reader reader) {
     return build(reader, null, null);
   }

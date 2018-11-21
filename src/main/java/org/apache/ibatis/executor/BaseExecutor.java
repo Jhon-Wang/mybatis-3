@@ -143,7 +143,7 @@ public abstract class BaseExecutor implements Executor {
   }
 
   /**
-   * 一级缓存开启时的查询
+   * 查询
    * @param ms
    * @param parameter
    * @param rowBounds
